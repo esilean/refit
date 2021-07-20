@@ -29,7 +29,6 @@ namespace Refit.Bff.Api
             services
                 .AddRefitClient<IPokemonApi>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://pokeapi.co/api/v2"));
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
