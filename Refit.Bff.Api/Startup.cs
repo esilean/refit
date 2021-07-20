@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Refit.Bff.Api.Interfaces;
+using Refit.Bff.Api.Middlewares;
 
 namespace Refit.Bff.Api
 {
@@ -29,6 +30,12 @@ namespace Refit.Bff.Api
             services
                 .AddRefitClient<IPokemonApi>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://pokeapi.co/api/v2"));
+
+            services.AddResponseCompression();
+            services.AddResponseCaching(x =>
+            {
+                x.MaximumBodySize = 2000000;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -39,6 +46,10 @@ namespace Refit.Bff.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Refit.Bff.Api v1"));
             }
+
+            app.UseResponseCompression();
+            app.UseResponseCaching();
+            app.UseMiddleware<LoggingRequestResponseMiddleware>();
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>
